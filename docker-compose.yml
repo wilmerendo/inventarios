@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./inventario:/var/www/html
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_NAME=inventario
+      - DB_USER=inventario_user
+      - DB_PASS=inventario_pass
+      - STOCK_MINIMO=5
+
+  db:
+    image: mysql:8.0
+    container_name: inventario_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=inventario
+      - MYSQL_USER=inventario_user
+      - MYSQL_PASSWORD=inventario_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    # Configuración especial para Windows
+    platform: linux/amd64
+
+volumes:
+  mysql_data:
